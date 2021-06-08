@@ -17,7 +17,7 @@ import {
 // The credentials are obtained from environment variables which
 // we set during our project creation step on Deno Deploy.
 const client = new DynamoDBClient({
-    region: "ap-south-1",
+    region: "eu-west-1",
     credentials: {
         accessKeyId: Deno.env.get("AWS_ACCESS_KEY_ID"),
         secretAccessKey: Deno.env.get("AWS_SECRET_ACCESS_KEY"),
