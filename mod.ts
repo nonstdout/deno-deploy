@@ -7,7 +7,9 @@ app.use(async (context) => {
     await send(context, context.request.url.pathname, {
         root: path.fromFileUrl(new URL("./public", import.meta.url)),
         index: "index.html",
-    });
+    }).catch(async (e) => {
+        console.log(e) 
+    })
 });
 
 addEventListener("fetch", app.fetchEventHandler());
