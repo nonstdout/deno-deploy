@@ -108,7 +108,7 @@ const apiRouter = async (req, params) => {
     const put = await dyno.putItem({
       "TableName": "items",
       "Item": {
-        "_id": 1234111,
+        "_id": 12,
         "item": req.body,
         },
     })
