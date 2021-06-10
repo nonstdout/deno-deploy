@@ -1,4 +1,4 @@
-fuck me!fuck me!# deno-deploy
+# deno-deploy
 
 ## stuff to do
 
@@ -54,8 +54,8 @@ Jin
 - [] Is it possible to create a Dynamodb instance from the API?
 
 Chris 
-- [] Create Sift endpoints
-- [] Work on getting a to do app demo ready (take the one from assesment)
+- [x] Create Sift endpoints
+- [x] Work on getting a to do app demo ready (take the one from assesment)
 - [] Read the Deploy API docs to see if it's possible to link to git hub and add env vars for Dynamo 
 
 She/He
