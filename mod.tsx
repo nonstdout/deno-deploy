@@ -1,8 +1,3 @@
-// addEventListener("fetch", (event: FetchEvent) => {
-//     console.log("The method is: ", event.request)
-//     event.respondWith(new Response(`You made a ${event.request.method} request`))
-// })
-
 import { h, jsx, serve, serveStatic, json, validateRequest } from "https://deno.land/x/sift@0.3.2/mod.ts";
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 import { Application, Router } from "https://deno.land/x/oak/mod.ts";
@@ -60,19 +55,6 @@ const NotFound = () => (
     <h1>Page not found</h1>
   </div>
 );
-
-
-// serve({
-//   "/": () => jsx(<App />),
-//   "/secret": () => jsx(<Secret />),
-//   // "/api": (req, params) => console.log(req, params),
-//   // "/api": (req, params) => apiRouter(req, params),
-//   "/api": (req, params) => app,
-//   "/api/:id": (req, params) => apiRouter(req, params),
-//   "/:filename+": serveStatic(".", { baseUrl: import.meta.url}),
-//   404: () => jsx(<NotFound />, { status: 404 }),
-// });
-
 
 
 const router = new Router();
@@ -144,29 +126,52 @@ router
     ctx.response.headers.set("Content-Type", "text/html; charset-utf8");
     ctx.response.body = render(<Secret></Secret>);
   })
+  .get("/api", (ctx) => 
+      ctx.response.body = render(<Secret></Secret>),
+    )
   // .get("/secret", (ctx) => 
   //     ctx.response.body = render(<Secret></Secret>),
   //   )
-  // .get("/secret", (ctx) => 
-  //     ctx.response.body = render(<Secret></Secret>),
-  //   )
 
 
+  const apiRouter = async (req, params) => {
+    // const { error, body } = await validateRequest(req, {
+    //   POST: {
+    //     body: ["item","_id"],
+    //   },
+    // });
+    // if (error) {
+    //   console.log(body)
+    //   return json({ error: error.message }, { status: error.status });
+    // }
+    // console.log(req)
+    // console.log(body)
+    if (req.method === 'GET') {
+      const tasks = await dyno.scan({
+        "TableName": "items"
+      })
+      return json(tasks.Items, {status:200})
+    }
+    if (req.method === 'POST') {
+      const put = await dyno.putItem({
+        "TableName": "items",
+        "Item": {
+          "_id": 12,
+          "item": req.body,
+          },
+      })
+      // console.log(req)
+      return json({}, {status:201})
+    }
+    if (req.method === 'DELETE') {
+      console.log(params.id)
+      return json({}, {status:200})
+    }
+    return json({message: "Method not implemented"}, {status:404})
+  }
+  
+  
 
-
-  // .get("/", (ctx) => {
-  //   ctx.response.body = dyno.scan({
-  //     "TableName": "items"
-  //   })
-  // })
-
-
-  // if (req.method === 'GET') {
-  //   const tasks = await dyno.scan({
-  //     "TableName": "items"
-  //   })
-  //   return json(tasks.Items, {status:200})
-  // }
 
 const app = new Application();
 app.addEventListener("error", (evt) => {
@@ -174,10 +179,10 @@ app.addEventListener("error", (evt) => {
     console.log(evt.error);
   });
 
-  app.use((ctx) => {
-    // Will throw a 500 on every request.
-    ctx.throw(404);
-  });
+  // app.use((ctx) => {
+  //   // Will throw a 500 on every request.
+  //   ctx.throw(404);
+  // });
 
 app.use(router.routes());
 app.use(router.allowedMethods());
@@ -194,27 +199,6 @@ const dyno = createClient();
 const result = await dyno.listTables();
 console.log(result)
 
-// const table = {
-//   "AttributeDefinitions": [ 
-//      { 
-//         "AttributeName": "_id",
-//         "AttributeType": "N"
-//      }
-//   ],
-//   "KeySchema": [ 
-//     { 
-//        "AttributeName": "_id",
-//        "KeyType": "HASH"
-//     }
-//  ],
-//  "TableName": "items",
-//  "BillingMode": "PAY_PER_REQUEST",
-// }
-
-
-// dyno.createTable(table)
-
-
 
  
 
@@ -222,40 +206,3 @@ console.log(result)
 
 
 const testTasks = [{_id: 1234, item: "stuff to do", created_at: 12345}]
-
-const apiRouter = async (req, params) => {
-  // const { error, body } = await validateRequest(req, {
-  //   POST: {
-  //     body: ["item","_id"],
-  //   },
-  // });
-  // if (error) {
-  //   console.log(body)
-  //   return json({ error: error.message }, { status: error.status });
-  // }
-  // console.log(req)
-  // console.log(body)
-  if (req.method === 'GET') {
-    const tasks = await dyno.scan({
-      "TableName": "items"
-    })
-    return json(tasks.Items, {status:200})
-  }
-  if (req.method === 'POST') {
-    const put = await dyno.putItem({
-      "TableName": "items",
-      "Item": {
-        "_id": 12,
-        "item": req.body,
-        },
-    })
-    // console.log(req)
-    return json({}, {status:201})
-  }
-  if (req.method === 'DELETE') {
-    console.log(params.id)
-    return json({}, {status:200})
-  }
-  return json({message: "Method not implemented"}, {status:404})
-}
-
