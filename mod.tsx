@@ -5,6 +5,36 @@
 
 import { h, jsx, serve, serveStatic, json, validateRequest } from "https://deno.land/x/sift@0.3.2/mod.ts";
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
+import { Application, Router } from "https://deno.land/x/oak/mod.ts";
+
+const router = new Router();
+router
+  .get("/", (ctx) => 
+    ctx.response.body = "hello world"
+    )
+  // .get("/", (ctx) => {
+  //   ctx.response.body = dyno.scan({
+  //     "TableName": "items"
+  //   })
+  // })
+
+
+  // if (req.method === 'GET') {
+  //   const tasks = await dyno.scan({
+  //     "TableName": "items"
+  //   })
+  //   return json(tasks.Items, {status:200})
+  // }
+
+const app = new Application();
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+addEventListener("fetch", app.fetchEventHandler());
+
+
+
 
 // if config/credentials not passed they will be read from the env/fs
 const dyno = createClient();
@@ -122,12 +152,13 @@ const apiRouter = async (req, params) => {
   return json({message: "Method not implemented"}, {status:404})
 }
 
-serve({
-  "/": () => jsx(<App />),
-  "/secret": () => jsx(<Secret />),
-  // "/api": (req, params) => console.log(req, params),
-  "/api": (req, params) => apiRouter(req, params),
-  "/api/:id": (req, params) => apiRouter(req, params),
-  "/:filename+": serveStatic(".", { baseUrl: import.meta.url}),
-  404: () => jsx(<NotFound />, { status: 404 }),
-});
+// serve({
+//   "/": () => jsx(<App />),
+//   "/secret": () => jsx(<Secret />),
+//   // "/api": (req, params) => console.log(req, params),
+//   // "/api": (req, params) => apiRouter(req, params),
+//   "/api": (req, params) => app,
+//   "/api/:id": (req, params) => apiRouter(req, params),
+//   "/:filename+": serveStatic(".", { baseUrl: import.meta.url}),
+//   404: () => jsx(<NotFound />, { status: 404 }),
+// });
