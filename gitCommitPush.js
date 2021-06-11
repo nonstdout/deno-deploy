@@ -2,6 +2,11 @@ const userGithubRepo = "https://github.com/nonstdout/deno-deploy.git"
 
 const commands = [
     {
+        cmd: ["git", "add", "."],
+        stdout: "piped",
+        stderr: "piped",
+    },
+    {
         cmd: ["git", "commit", "-am", "'DENO COMMIT'"],
         stdout: "piped",
         stderr: "piped",
@@ -20,7 +25,6 @@ for await (const item of commands) {
     console.log(cmd)
 
     const { code } = await cmd.status(); // (*1); wait here for child to finish
-    console.log(cmd)
 
     const rawOutput = await cmd.output();
     const rawError = await cmd.stderrOutput();
@@ -33,6 +37,6 @@ for await (const item of commands) {
         const errorString = new TextDecoder().decode(rawError);
         console.log(errorString);
     }
-    Deno.exit(code);
 }
+Deno.exit(0);
 
