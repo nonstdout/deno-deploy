@@ -13,22 +13,24 @@ const commands = [
     },
 ]
 
-commands.forEach(item => {
+for (const item of commands) {
+
     let cmd = Deno.run(item)
 
 
-    const { code } = cmd.status(); // (*1); wait here for child to finish
+    const { code } = await cmd.status(); // (*1); wait here for child to finish
 
-    const rawOutput = cmd.output();
-    const rawError = cmd.stderrOutput();
+    const rawOutput = await cmd.output();
+    const rawError = await cmd.stderrOutput();
 
 
     if (code === 0) {
-        Deno.stdout.write(rawOutput);
+        await Deno.stdout.write(rawOutput);
         console.log(`Commited ${userGithubRepo} sucessfully.`)
     } else {
         const errorString = new TextDecoder().decode(rawError);
         console.log(errorString);
     }
-})
-Deno.exit(code);
+    Deno.exit(code);
+}
+
